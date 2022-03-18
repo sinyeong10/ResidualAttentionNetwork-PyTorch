@@ -1,23 +1,17 @@
-import torch
 import torch.nn as nn
-from torch.nn import init
-import functools
-from torch.autograd import Variable
-import numpy as np
-
-from .basic_layers import ResidualBlock
+from basic_layers import ResidualBlock
 
 
-class AttentionModule_pre(nn.Module):
+class AttentionModulePre(nn.Module):
 
     def __init__(self, in_channels, out_channels, size1, size2, size3):
-        super(AttentionModule_pre, self).__init__()
+        super(AttentionModulePre, self).__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
             ResidualBlock(in_channels, out_channels),
             ResidualBlock(in_channels, out_channels)
-         )
+        )
 
         self.mpool1 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
@@ -51,10 +45,10 @@ class AttentionModule_pre(nn.Module):
         self.softmax6_blocks = nn.Sequential(
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels , kernel_size = 1, stride = 1, bias = False),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels , kernel_size = 1, stride = 1, bias = False),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.Sigmoid()
         )
 
@@ -88,16 +82,16 @@ class AttentionModule_pre(nn.Module):
         return out_last
 
 
-class AttentionModule_stage0(nn.Module):
+class AttentionModuleStage0(nn.Module):
     # input size is 112*112
     def __init__(self, in_channels, out_channels, size1=(112, 112), size2=(56, 56), size3=(28, 28), size4=(14, 14)):
-        super(AttentionModule_stage0, self).__init__()
+        super(AttentionModuleStage0, self).__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
             ResidualBlock(in_channels, out_channels),
             ResidualBlock(in_channels, out_channels)
-         )
+        )
 
         self.mpool1 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         # 56*56
@@ -132,10 +126,10 @@ class AttentionModule_stage0(nn.Module):
         self.softmax8_blocks = nn.Sequential(
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias = False),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels , kernel_size=1, stride=1, bias = False),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.Sigmoid()
         )
 
@@ -179,16 +173,16 @@ class AttentionModule_stage0(nn.Module):
         return out_last
 
 
-class AttentionModule_stage1(nn.Module):
+class AttentionModuleStage1(nn.Module):
     # input size is 56*56
     def __init__(self, in_channels, out_channels, size1=(56, 56), size2=(28, 28), size3=(14, 14)):
-        super(AttentionModule_stage1, self).__init__()
+        super(AttentionModuleStage1, self).__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
             ResidualBlock(in_channels, out_channels),
             ResidualBlock(in_channels, out_channels)
-         )
+        )
 
         self.mpool1 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
@@ -222,10 +216,10 @@ class AttentionModule_stage1(nn.Module):
         self.softmax6_blocks = nn.Sequential(
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels , kernel_size = 1, stride = 1, bias = False),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels , kernel_size = 1, stride = 1, bias = False),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.Sigmoid()
         )
 
@@ -259,16 +253,16 @@ class AttentionModule_stage1(nn.Module):
         return out_last
 
 
-class AttentionModule_stage2(nn.Module):
+class AttentionModuleStage2(nn.Module):
     # input image size is 28*28
     def __init__(self, in_channels, out_channels, size1=(28, 28), size2=(14, 14)):
-        super(AttentionModule_stage2, self).__init__()
+        super(AttentionModuleStage2, self).__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
             ResidualBlock(in_channels, out_channels),
             ResidualBlock(in_channels, out_channels)
-         )
+        )
 
         self.mpool1 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
@@ -323,16 +317,16 @@ class AttentionModule_stage2(nn.Module):
         return out_last
 
 
-class AttentionModule_stage3(nn.Module):
+class AttentionModuleStage3(nn.Module):
     # input image size is 14*14
     def __init__(self, in_channels, out_channels, size1=(14, 14)):
-        super(AttentionModule_stage3, self).__init__()
+        super(AttentionModuleStage3, self).__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
             ResidualBlock(in_channels, out_channels),
             ResidualBlock(in_channels, out_channels)
-         )
+        )
 
         self.mpool1 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.softmax1_blocks = nn.Sequential(
@@ -368,16 +362,16 @@ class AttentionModule_stage3(nn.Module):
         return out_last
 
 
-class AttentionModule_stage1_cifar(nn.Module):
+class AttentionModuleStage1Cifar(nn.Module):
     # input size is 16*16
     def __init__(self, in_channels, out_channels, size1=(16, 16), size2=(8, 8)):
-        super(AttentionModule_stage1_cifar, self).__init__()
+        super(AttentionModuleStage1Cifar, self).__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
             ResidualBlock(in_channels, out_channels),
             ResidualBlock(in_channels, out_channels)
-         )
+        )
 
         self.mpool1 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)  # 8*8
 
@@ -404,7 +398,7 @@ class AttentionModule_stage1_cifar(nn.Module):
             nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias = False),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.Sigmoid()
         )
 
@@ -432,16 +426,16 @@ class AttentionModule_stage1_cifar(nn.Module):
         return out_last
 
 
-class AttentionModule_stage2_cifar(nn.Module):
+class AttentionModuleStage2Cifar(nn.Module):
     # input size is 8*8
     def __init__(self, in_channels, out_channels, size=(8, 8)):
-        super(AttentionModule_stage2_cifar, self).__init__()
+        super(AttentionModuleStage2Cifar, self).__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
             ResidualBlock(in_channels, out_channels),
             ResidualBlock(in_channels, out_channels)
-         )
+        )
 
         self.mpool1 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)  # 4*4
 
@@ -458,7 +452,7 @@ class AttentionModule_stage2_cifar(nn.Module):
             nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias = False),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.Sigmoid()
         )
 
@@ -480,16 +474,16 @@ class AttentionModule_stage2_cifar(nn.Module):
         return out_last
 
 
-class AttentionModule_stage3_cifar(nn.Module):
+class AttentionModuleStage3Cifar(nn.Module):
     # input size is 4*4
-    def __init__(self, in_channels, out_channels, size=(8, 8)):
-        super(AttentionModule_stage3_cifar, self).__init__()
+    def __init__(self, in_channels, out_channels):
+        super(AttentionModuleStage3Cifar, self).__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
             ResidualBlock(in_channels, out_channels),
             ResidualBlock(in_channels, out_channels)
-         )
+        )
 
         self.middle_2r_blocks = nn.Sequential(
             ResidualBlock(in_channels, out_channels),
@@ -502,7 +496,7 @@ class AttentionModule_stage3_cifar(nn.Module):
             nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias = False),
+            nn.Conv2d(out_channels, out_channels, kernel_size=1, stride=1, bias=False),
             nn.Sigmoid()
         )
 
