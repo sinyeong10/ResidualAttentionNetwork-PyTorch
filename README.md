@@ -25,7 +25,7 @@ Note: To switch the model you're training on, be sure to replace the imported mo
 ```python
 from model.residual_attention_network import ResidualAttentionModel92U as ResidualAttentionModel
 ```
-either on [main.py](https://github.com/Necas209/RAN-PyTorch/main.py) or [main_mixup.py](https://github.com/Necas209/RAN-PyTorch/main_mixup.py), depending if you use mixup or not.
+either on [main.py](https://github.com/Necas209/RAN-PyTorch/blob/master/main.py) or [main_mixup.py](https://github.com/Necas209/RAN-PyTorch/blob/master/main_mixup.py), depending if you use mixup or not.
 
 ### Tracking training progress with TensorBoard
 To track training progress, this implementation uses [TensorBoard](https://www.tensorflow.org/get_started/summaries_and_tensorboard) which offers great ways to track and compare multiple experiments. To track PyTorch experiments in TensorBoard we use [tensorboard_logger](https://github.com/TeamHG-Memex/tensorboard_logger) which can be installed with 
