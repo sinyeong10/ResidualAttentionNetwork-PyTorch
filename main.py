@@ -60,21 +60,23 @@ def main():
     train_size = len(dataset) - val_size
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
 
-    test_dataset = datasets.CIFAR10(root='./data/',
-                                    train=False,
+    test_dataset = datasets.CIFAR10(root='../data/', train=False,
                                     transform=test_transform)
 
     # Data Loader (Input Pipeline)
+    kwargs = {'num_workers': 1, 'pin_memory': True}
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size,
-                                               shuffle=True, num_workers=8)
+                                               shuffle=True, **kwargs)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=args.batch_size,
-                                             shuffle=True)
+                                             shuffle=True, **kwargs)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size,
-                                              shuffle=True)
+                                              shuffle=True, **kwargs)
 
-    model = ResidualAttentionModel().cuda()
+    model = ResidualAttentionModel()
+    model = model.cuda()
 
     cudnn.benchmark = True
+
     if args.test:
         args.test = f"runs/{args.test}/checkpoint.pth.tar"
         if os.path.isfile(args.test):

@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 
 # from model.residual_attention_network_pre import ResidualAttentionModel
 # based https://github.com/liudaizong/Residual-Attention-Network
-from model.residual_attention_network import ResidualAttentionModel92U as ResidualAttentionModel
+from residual_attention_network import ResidualAttentionModel92U as ResidualAttentionModel
 from utils import *
 
 model_file = 'model_92_sgd_mixup300_normal20.pkl'
@@ -33,7 +33,7 @@ def train(model: ResidualAttentionModel, train_loader: torch.utils.data.DataLoad
     end = time.perf_counter()
     for i, (images, labels) in enumerate(train_loader):
         images = images.cuda()
-        labels = labels.cuda()
+        labels = labels.cuda(non_blocking=True)
 
         output = torch.Tensor()
         if is_mixup:
@@ -71,6 +71,49 @@ def train(model: ResidualAttentionModel, train_loader: torch.utils.data.DataLoad
         log_value('train_acc', top1.avg, epoch)
 
 
+def validate(model: ResidualAttentionModel, val_loader: torch.utils.data.DataLoader,
+             criterion: nn.CrossEntropyLoss, epoch: int, args: Namespace):
+    """Perform validation on the validation set"""
+    batch_time = AverageMeter()
+    losses = AverageMeter()
+    top1 = AverageMeter()
+
+    # switch to evaluate mode
+    model.eval()
+
+    end = time.perf_counter()
+    for i, (inp, target) in enumerate(val_loader):
+        target: torch.Tensor = target.cuda(non_blocking=True)
+        inp: torch.Tensor = inp.cuda()
+
+        # compute output
+        with torch.no_grad():
+            output: torch.Tensor = model(inp)
+            loss: torch.Tensor = criterion(output, target)
+
+        # measure accuracy and record loss
+        prec1: torch.Tensor = accuracy(output.data, target, topk=(1,))[0]
+        losses.update(loss.data, inp.size(0))
+        top1.update(prec1, inp.size(0))
+
+        # measure elapsed time
+        batch_time.update(time.perf_counter() - end)
+        end = time.perf_counter()
+
+        if i % args.print_freq == 0:
+            print(f'Test: [{i}/{len(val_loader)}]\t'
+                  f'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                  f'Loss {losses.val:.4f} ({losses.avg:.4f})\t'
+                  f'Prec@1 {top1.val:.3f} ({top1.avg:.3f})')
+
+    print(' * Prec@1 {top1.avg:.3f}'.format(top1=top1))
+    # log to TensorBoard
+    if args.tensorboard:
+        log_value('val_loss', losses.avg, epoch)
+        log_value('val_acc', top1.avg, epoch)
+    return top1.avg
+
+
 def test(model: ResidualAttentionModel, test_loader: torch.utils.data.DataLoader):
     """Perform testing on the test set"""
     top1 = AverageMeter()
@@ -84,7 +127,7 @@ def test(model: ResidualAttentionModel, test_loader: torch.utils.data.DataLoader
 
     for images, labels in test_loader:
         images: torch.Tensor = images.cuda()
-        labels: torch.Tensor = labels.cuda()
+        labels: torch.Tensor = labels.cuda(non_blocking=True)
 
         with torch.no_grad():
             outputs: torch.Tensor = model(images)
@@ -97,7 +140,7 @@ def test(model: ResidualAttentionModel, test_loader: torch.utils.data.DataLoader
         correct += (predicted == labels.data).sum()
         #
         c = (predicted == labels.data).squeeze()
-        for i in range(20):
+        for i in range(16):
             label = labels.data[i]
             class_correct[label] += c[i]
             class_total[label] += 1

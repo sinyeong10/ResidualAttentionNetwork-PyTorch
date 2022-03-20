@@ -39,7 +39,7 @@ args = Namespace
 
 def main():
     global args, best_prec1
-    args.parser.parse_args()
+    args = parser.parse_args()
     if args.tensorboard:
         configure(f"runs/{args.name}")
 
@@ -64,17 +64,18 @@ def main():
     train_size = len(dataset) - val_size
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
 
-    test_dataset = datasets.CIFAR10(root='./data/',
+    test_dataset = datasets.CIFAR10(root='../data/',
                                     train=False,
                                     transform=test_transform)
 
     # Data Loader (Input Pipeline)
+    kwargs = {'num_workers': 1, 'pin_memory': True}
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size,
-                                               shuffle=True, num_workers=8)
+                                               shuffle=True, **kwargs)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=args.batch_size,
-                                             shuffle=True)
+                                             shuffle=True, **kwargs)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size,
-                                              shuffle=True)
+                                              shuffle=True, **kwargs)
 
     model = ResidualAttentionModel().cuda()
 
@@ -88,7 +89,7 @@ def main():
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
             print(f"=> loaded model '{args.test}'")
-            test(model, test_loader, args)
+            test(model, test_loader)
         else:
             print(f"=> no model found at '{args.test}'")
         return
@@ -101,20 +102,25 @@ def main():
 
     for epoch in range(args.epochs):
         # Decaying Learning Rate
-        adjust_learning_rate(optimizer, epoch)
+        adjust_learning_rate(optimizer, epoch, args)
 
         # train for one epoch
-        print('evaluate test set:')
-        acc = test(model, test_loader, btrain=True)
-        if acc > acc_best:
-            acc_best = acc
-            print('current best acc,', acc_best)
-            torch.save(model.state_dict(), model_file)
-        # Save the Model
-        torch.save(model.state_dict(), 'last_model_92_sgd_mixup300_normal20.pkl')
+        train(model, train_loader, criterion, optimizer, epoch, args)
 
-    else:
-        test(model, test_loader, btrain=False)
+        # evaluate on validation set
+        prec1 = validate(model, val_loader, criterion, epoch, args)
+
+        # remember best prec@1 and save checkpoint
+        is_best = prec1 > best_prec1
+        best_prec1 = max(prec1, best_prec1)
+        save_checkpoint({
+            'epoch': epoch + 1,
+            'state_dict': model.state_dict(),
+            'best_prec1': best_prec1,
+        }, is_best, args=args)
+    print('Best accuracy: ', best_prec1)
+
+    test(model, test_loader)
 
 
 if __name__ == "__main__":

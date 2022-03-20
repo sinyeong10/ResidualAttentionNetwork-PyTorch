@@ -22,7 +22,7 @@ class AverageMeter(object):
         self.sum = 0.
         self.count = 0.
 
-    def update(self, val: Union[torch.Tensor, float], n: int = 1):
+    def update(self, val, n: int = 1):
         self.val = val
         self.sum += val * n
         self.count += n
@@ -37,7 +37,6 @@ def adjust_learning_rate(optimizer: torch.optim.SGD, epoch: int, args: Namespace
         log_value('learning_rate', lr, epoch)
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
-        print(param_group['lr'])
 
 
 def save_checkpoint(state: dict, is_best: bool, filename: str = 'checkpoint.pth.tar', args: Namespace = None):

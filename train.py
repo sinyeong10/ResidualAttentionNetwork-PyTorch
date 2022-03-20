@@ -7,7 +7,7 @@ import torch.utils.data
 
 # from model.residual_attention_network_pre import ResidualAttentionModel
 # based https://github.com/liudaizong/Residual-Attention-Network
-from model.residual_attention_network import ResidualAttentionModel92U as ResidualAttentionModel
+from residual_attention_network import ResidualAttentionModel92U as ResidualAttentionModel
 from utils import *
 
 # used for logging to TensorBoard
@@ -30,7 +30,7 @@ def train(model: ResidualAttentionModel, train_loader: torch.utils.data.DataLoad
     end = time.perf_counter()
     for i, (images, labels) in enumerate(train_loader):
         images = images.cuda()
-        labels = labels.cuda()
+        labels = labels.cuda(non_blocking=True)
 
         # ForProp
         output = model(images)
@@ -73,7 +73,7 @@ def validate(model: ResidualAttentionModel, val_loader: torch.utils.data.DataLoa
 
     end = time.perf_counter()
     for i, (inp, target) in enumerate(val_loader):
-        target: torch.Tensor = target.cuda()
+        target: torch.Tensor = target.cuda(non_blocking=True)
         inp: torch.Tensor = inp.cuda()
 
         # compute output
@@ -117,7 +117,7 @@ def test(model: ResidualAttentionModel, test_loader: torch.utils.data.DataLoader
 
     for images, labels in test_loader:
         images: torch.Tensor = images.cuda()
-        labels: torch.Tensor = labels.cuda()
+        labels: torch.Tensor = labels.cuda(non_blocking=True)
 
         with torch.no_grad():
             outputs: torch.Tensor = model(images)
@@ -130,7 +130,7 @@ def test(model: ResidualAttentionModel, test_loader: torch.utils.data.DataLoader
         correct += (predicted == labels.data).sum()
         #
         c = (predicted == labels.data).squeeze()
-        for i in range(20):
+        for i in range(16):
             label = labels.data[i]
             class_correct[label] += c[i]
             class_total[label] += 1
