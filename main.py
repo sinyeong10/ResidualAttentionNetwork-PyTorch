@@ -72,8 +72,12 @@ def main():
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size,
                                               shuffle=True, **kwargs)
 
+    # Create model
     model = ResidualAttentionModel()
     model = model.cuda()
+
+    # get the number of model parameters
+    print(f'Number of model parameters: {sum([p.data.nelement() for p in model.parameters()])}')
 
     cudnn.benchmark = True
 
