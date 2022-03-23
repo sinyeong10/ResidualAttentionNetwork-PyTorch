@@ -12,6 +12,8 @@ from train_mixup import *
 parser = ArgumentParser(description='PyTorch Residual Attention Network')
 parser.add_argument('--epochs', default=350, type=int,
                     help='number of total epochs to run')
+parser.add_argument('--start-epoch', default=0, type=int,
+                    help='manual epoch number (useful on restarts)')
 parser.add_argument('-b', '--batch-size', default=64, type=int,
                     help='mini-batch size (default: 64)')
 parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
@@ -25,9 +27,11 @@ parser.add_argument('--layers', default=100, type=int,
                     help='total number of layers (default: 100)')
 parser.add_argument('--growth', default=12, type=int,
                     help='number of new channels per layer (default: 12)')
+parser.add_argument('--resume', default='', type=str,
+                    help='path to latest checkpoint (default: none)')
 parser.add_argument('--test', default='', type=str,
                     help='path to trained model (default: none)')
-parser.add_argument('--name', default='DenseNet_BC_100_12', type=str,
+parser.add_argument('--name', default='ResNet-92-32U', type=str,
                     help='name of experiment')
 parser.add_argument('--tensorboard',
                     help='Log progress to TensorBoard', action='store_true')
@@ -84,7 +88,21 @@ def main():
     # get the number of model parameters
     print(f'Number of model parameters: {sum([p.data.nelement() for p in model.parameters()])}')
 
+    # optionally resume from a checkpoint
+    if args.resume:
+        args.resume = f"runs/{args.resume}/checkpoint.pth.tar"
+        if os.path.isfile(args.resume):
+            print(f"=> loading checkpoint '{args.resume}'")
+            checkpoint = torch.load(args.resume)
+            args.start_epoch = checkpoint['epoch']
+            best_prec1 = checkpoint['best_prec1']
+            model.load_state_dict(checkpoint['state_dict'])
+            print(f"=> loaded checkpoint '{args.resume}' (epoch {checkpoint['epoch']})")
+        else:
+            print(f"=> no checkpoint found at '{args.resume}'")
+
     cudnn.benchmark = True
+    # Enter test mode
     if args.test:
         args.test = f"runs/{args.test}/checkpoint.pth.tar"
         if os.path.isfile(args.test):
@@ -105,7 +123,7 @@ def main():
                                 nesterov=True,
                                 weight_decay=args.weight_decay)
 
-    for epoch in range(args.epochs):
+    for epoch in range(args.start_epoch, args.epochs):
         # Decaying Learning Rate
         adjust_learning_rate(optimizer, epoch, args)
 
@@ -123,7 +141,7 @@ def main():
             'state_dict': model.state_dict(),
             'best_prec1': best_prec1,
         }, is_best, args=args)
-    print('Best accuracy: ', best_prec1)
+    print(f'Best accuracy: {best_prec1:.3f}')
 
     test(model, test_loader)
 

@@ -9,8 +9,6 @@ from torch.utils.data import Dataset
 from residual_attention_network import ResidualAttentionModel92U as ResidualAttentionModel
 from utils import *
 
-model_file = 'model_92_sgd_mixup300_normal20.pkl'
-
 classes = ('plane', 'car', 'bird', 'cat', 'deer',
            'dog', 'frog', 'horse', 'ship', 'truck')
 
@@ -43,16 +41,19 @@ def train(model: ResidualAttentionModel, train_loader: torch.utils.data.DataLoad
             # ForwardProp
             output = model(images)
             loss = mixup_criterion(criterion, output, targets_a, targets_b, lam)
+            # measure accuracy and record loss
+            _, predicted = torch.max(output.data, 1)
+            total += images.size(0)
+            correct += lam * predicted.eq(targets_a.data).sum() + (1 - lam) * predicted.eq(targets_b.data).sum()
+            prec1 = 100 * correct / total
         else:
             # ForwardProp
             output = model(images)
             loss = criterion(output, labels)
+            # measure accuracy and record loss
+            prec1 = accuracy(output.data, labels, topk=(1,))[0]
 
-        # measure accuracy and record loss
-        _, predicted = torch.max(output.data, 1)
-        total += images.size(0)
-        correct += lam * predicted.eq(targets_a.data).sum() + (1 - lam) * predicted.eq(targets_b.data).sum()
-        prec1 = correct / total
+        # update variables
         losses.update(loss.data, images.size(0))
         top1.update(prec1, images.size(0))
 
