@@ -33,7 +33,7 @@ best_prec1 = 0.
 args = Namespace
 
 
-def main():
+def main() -> None:
     global args, best_prec1
     args = parser.parse_args()
     if args.tensorboard:
