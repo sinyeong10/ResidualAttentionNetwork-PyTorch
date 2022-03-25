@@ -1,7 +1,6 @@
 import os
 import shutil
 from argparse import Namespace
-from typing import Union
 
 import torch
 from tensorboard_logger import log_value
