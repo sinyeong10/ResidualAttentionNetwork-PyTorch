@@ -1,6 +1,3 @@
-import os
-import shutil
-
 from torch.backends import cudnn
 from torch.utils.data import Dataset
 from torchvision import transforms, datasets

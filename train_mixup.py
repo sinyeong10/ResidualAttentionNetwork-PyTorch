@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 import torch.nn as nn
-from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
 
 # from model.residual_attention_network_pre import ResidualAttentionModel
 # based https://github.com/liudaizong/Residual-Attention-Network
@@ -13,8 +13,8 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer',
            'dog', 'frog', 'horse', 'ship', 'truck')
 
 
-def train(model: ResidualAttentionModel, train_loader: torch.utils.data.DataLoader,
-          criterion: nn.CrossEntropyLoss, optimizer: torch.optim.SGD, epoch: int, args: Namespace):
+def train(model: ResidualAttentionModel, train_loader: DataLoader, criterion: nn.CrossEntropyLoss,
+          optimizer: torch.optim.SGD, epoch: int, args: Namespace):
     """Train for one epoch on the training set"""
     batch_time = AverageMeter()
     losses = AverageMeter()
@@ -35,26 +35,25 @@ def train(model: ResidualAttentionModel, train_loader: torch.utils.data.DataLoad
         images = images.cuda()
         labels = labels.cuda(non_blocking=True)
 
-        output = torch.Tensor()
         if is_mixup:
             images, targets_a, targets_b, lam = mixup_data(images, labels, alpha=1.0)
             # ForwardProp
             output = model(images)
             loss = mixup_criterion(criterion, output, targets_a, targets_b, lam)
             # measure accuracy and record loss
-            _, predicted = torch.max(output.data, 1)
+            _, predicted = torch.max(output, 1)
             total += images.size(0)
-            correct += lam * predicted.eq(targets_a.data).sum() + (1 - lam) * predicted.eq(targets_b.data).sum()
+            correct += lam * predicted.eq(targets_a).sum() + (1 - lam) * predicted.eq(targets_b).sum()
             prec1 = 100 * correct / total
         else:
             # ForwardProp
             output = model(images)
             loss = criterion(output, labels)
             # measure accuracy and record loss
-            prec1 = accuracy(output.data, labels, topk=(1,))[0]
+            prec1 = accuracy(output, labels, topk=(1,))[0]
 
         # update variables
-        losses.update(loss.data, images.size(0))
+        losses.update(loss, images.size(0))
         top1.update(prec1, images.size(0))
 
         # BackProp + Optimize
@@ -77,7 +76,7 @@ def train(model: ResidualAttentionModel, train_loader: torch.utils.data.DataLoad
         log_value('train_acc', top1.avg, epoch)
 
 
-def validate(model: ResidualAttentionModel, val_loader: torch.utils.data.DataLoader,
+def validate(model: ResidualAttentionModel, val_loader: DataLoader,
              criterion: nn.CrossEntropyLoss, epoch: int, args: Namespace):
     """Perform validation on the validation set"""
     batch_time = AverageMeter()
@@ -98,8 +97,8 @@ def validate(model: ResidualAttentionModel, val_loader: torch.utils.data.DataLoa
             loss: torch.Tensor = criterion(output, target)
 
         # measure accuracy and record loss
-        prec1: torch.Tensor = accuracy(output.data, target, topk=(1,))[0]
-        losses.update(loss.data, inp.size(0))
+        prec1: torch.Tensor = accuracy(output, target, topk=(1,))[0]
+        losses.update(loss, inp.size(0))
         top1.update(prec1, inp.size(0))
 
         # measure elapsed time
@@ -120,7 +119,7 @@ def validate(model: ResidualAttentionModel, val_loader: torch.utils.data.DataLoa
     return top1.avg
 
 
-def test(model: ResidualAttentionModel, test_loader: torch.utils.data.DataLoader):
+def test(model: ResidualAttentionModel, test_loader: DataLoader):
     """Perform testing on the test set"""
     top1 = AverageMeter()
 
@@ -138,16 +137,16 @@ def test(model: ResidualAttentionModel, test_loader: torch.utils.data.DataLoader
         with torch.no_grad():
             outputs: torch.Tensor = model(images)
 
-        _, predicted = torch.max(outputs.cuda().data, 1)
-        prec1: torch.Tensor = accuracy(outputs.data, labels, topk=(1,))[0]
+        _, predicted = torch.max(outputs.cuda(), 1)
+        prec1: torch.Tensor = accuracy(outputs, labels, topk=(1,))[0]
         top1.update(prec1, images.size(0))
 
         total += labels.size(0)
-        correct += (predicted == labels.data).sum()
+        correct += (predicted == labels).sum()
         #
-        c = (predicted == labels.data).squeeze()
+        c = (predicted == labels).squeeze()
         for i in range(16):
-            label = labels.data[i]
+            label = labels[i]
             class_correct[label] += c[i]
             class_total[label] += 1
 
