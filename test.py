@@ -1,5 +1,6 @@
 import time
 
+import numpy as np
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
@@ -63,8 +64,8 @@ def test(model: ResidualAttentionModel, test_loader: DataLoader):
 
     correct = 0
     total = 0
-    class_correct = list(0. for _ in range(10))
-    class_total = list(0. for _ in range(10))
+    class_correct = np.zeros(10)
+    class_total = np.zeros(10)
 
     for images, labels in test_loader:
         images: torch.Tensor = images.cuda()
@@ -74,12 +75,11 @@ def test(model: ResidualAttentionModel, test_loader: DataLoader):
             outputs: torch.Tensor = model(images)
 
         _, predicted = torch.max(outputs.cuda(), 1)
-        prec1: torch.Tensor = accuracy(outputs, labels, topk=(1,))[0]
+        prec1 = accuracy(outputs, labels, topk=(1,))[0]
         top1.update(prec1, images.size(0))
 
         total += labels.size(0)
         correct += (predicted == labels).sum()
-        #
         c = (predicted == labels).squeeze()
         for i in range(16):
             label = labels[i]
