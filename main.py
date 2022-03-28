@@ -91,7 +91,7 @@ def main() -> None:
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
             print(f"=> loaded model '{args.test}'")
-            test(model, test_loader, args)
+            test(model, test_loader)
         else:
             print(f"=> no model found at '{args.test}'")
         return
@@ -122,7 +122,7 @@ def main() -> None:
         }, is_best, args=args)
     print('Best accuracy: ', best_prec1)
 
-    test(model, test_loader, args)
+    test(model, test_loader)
 
 
 if __name__ == "__main__":

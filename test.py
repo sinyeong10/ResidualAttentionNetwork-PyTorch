@@ -56,7 +56,7 @@ def validate(model: ResidualAttentionModel, val_loader: DataLoader,
     return top1.avg
 
 
-def test(model: ResidualAttentionModel, test_loader: DataLoader, args: Namespace):
+def test(model: ResidualAttentionModel, test_loader: DataLoader):
     """Perform testing on the test set"""
     top1 = AverageMeter()
 
@@ -81,7 +81,7 @@ def test(model: ResidualAttentionModel, test_loader: DataLoader, args: Namespace
         total += labels.size(0)
         correct += (predicted == labels).sum()
         c = (predicted == labels).squeeze()
-        for i in range(args.batch_size):
+        for i in range(labels.size(0)):
             label = labels[i]
             class_correct[label] += c[i]
             class_total[label] += 1
