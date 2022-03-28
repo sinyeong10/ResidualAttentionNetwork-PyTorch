@@ -5,6 +5,7 @@ from torchvision import transforms, datasets
 from tensorboard_logger import configure
 from argparse import ArgumentParser
 from train_mixup import *
+from test import *
 
 parser = ArgumentParser(description='PyTorch Residual Attention Network')
 parser.add_argument('--epochs', default=350, type=int,
