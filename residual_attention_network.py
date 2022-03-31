@@ -7,7 +7,7 @@ from attention_module import AttentionModuleStage1Cifar, AttentionModuleStage2Ci
 class ResidualAttentionModel448(nn.Module):
     # for input size 448
     def __init__(self):
-        super(ResidualAttentionModel448, self).__init__()
+        super().__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False),
             nn.BatchNorm2d(64),
@@ -68,7 +68,7 @@ class ResidualAttentionModel448(nn.Module):
 class ResidualAttentionModel92(nn.Module):
     # for input size 224
     def __init__(self):
-        super(ResidualAttentionModel92, self).__init__()
+        super().__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False),
             nn.BatchNorm2d(64),
@@ -121,7 +121,7 @@ class ResidualAttentionModel92(nn.Module):
 class ResidualAttentionModel56(nn.Module):
     # for input size 224
     def __init__(self):
-        super(ResidualAttentionModel56, self).__init__()
+        super().__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False),
             nn.BatchNorm2d(64),
@@ -168,7 +168,7 @@ class ResidualAttentionModel56(nn.Module):
 class ResidualAttentionModel92Cifar10(nn.Module):
     # for input size 32
     def __init__(self):
-        super(ResidualAttentionModel92Cifar10, self).__init__()
+        super().__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(3, 32, kernel_size=5, stride=1, padding=2, bias=False),
             nn.BatchNorm2d(32),
@@ -221,7 +221,7 @@ class ResidualAttentionModel92Cifar10(nn.Module):
 class ResidualAttentionModel92U(nn.Module):
     # for input size 32
     def __init__(self):
-        super(ResidualAttentionModel92U, self).__init__()
+        super().__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(32),

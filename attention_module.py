@@ -5,7 +5,7 @@ from basic_layers import ResidualBlock
 class AttentionModulePre(nn.Module):
 
     def __init__(self, in_channels, out_channels, size1, size2, size3):
-        super(AttentionModulePre, self).__init__()
+        super().__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
@@ -85,7 +85,7 @@ class AttentionModulePre(nn.Module):
 class AttentionModuleStage0(nn.Module):
     # input size is 112*112
     def __init__(self, in_channels, out_channels, size1=(112, 112), size2=(56, 56), size3=(28, 28), size4=(14, 14)):
-        super(AttentionModuleStage0, self).__init__()
+        super().__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
@@ -176,7 +176,7 @@ class AttentionModuleStage0(nn.Module):
 class AttentionModuleStage1(nn.Module):
     # input size is 56*56
     def __init__(self, in_channels, out_channels, size1=(56, 56), size2=(28, 28), size3=(14, 14)):
-        super(AttentionModuleStage1, self).__init__()
+        super().__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
@@ -256,7 +256,7 @@ class AttentionModuleStage1(nn.Module):
 class AttentionModuleStage2(nn.Module):
     # input image size is 28*28
     def __init__(self, in_channels, out_channels, size1=(28, 28), size2=(14, 14)):
-        super(AttentionModuleStage2, self).__init__()
+        super().__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
@@ -320,7 +320,7 @@ class AttentionModuleStage2(nn.Module):
 class AttentionModuleStage3(nn.Module):
     # input image size is 14*14
     def __init__(self, in_channels, out_channels, size1=(14, 14)):
-        super(AttentionModuleStage3, self).__init__()
+        super().__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
@@ -365,7 +365,7 @@ class AttentionModuleStage3(nn.Module):
 class AttentionModuleStage1Cifar(nn.Module):
     # input size is 16*16
     def __init__(self, in_channels, out_channels, size1=(16, 16), size2=(8, 8)):
-        super(AttentionModuleStage1Cifar, self).__init__()
+        super().__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
@@ -429,7 +429,7 @@ class AttentionModuleStage1Cifar(nn.Module):
 class AttentionModuleStage2Cifar(nn.Module):
     # input size is 8*8
     def __init__(self, in_channels, out_channels, size=(8, 8)):
-        super(AttentionModuleStage2Cifar, self).__init__()
+        super().__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(
@@ -477,7 +477,7 @@ class AttentionModuleStage2Cifar(nn.Module):
 class AttentionModuleStage3Cifar(nn.Module):
     # input size is 4*4
     def __init__(self, in_channels, out_channels):
-        super(AttentionModuleStage3Cifar, self).__init__()
+        super().__init__()
         self.first_residual_blocks = ResidualBlock(in_channels, out_channels)
 
         self.trunk_branches = nn.Sequential(

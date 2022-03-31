@@ -3,7 +3,7 @@ import torch.nn as nn
 
 class ResidualBlock(nn.Module):
     def __init__(self, input_channels, output_channels, stride=1):
-        super(ResidualBlock, self).__init__()
+        super().__init__()
         self.input_channels = input_channels
         self.output_channels = output_channels
         self.stride = stride
