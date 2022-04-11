@@ -2,9 +2,12 @@ import time
 
 import numpy as np
 import torch.nn as nn
+import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
+from torchvision import transforms
 
 # based https://github.com/liudaizong/Residual-Attention-Network
+
 from residual_attention_network import ResidualAttentionModel92U as ResidualAttentionModel
 from utils import *
 
@@ -56,12 +59,13 @@ def validate(model: ResidualAttentionModel, val_loader: DataLoader,
     return top1.avg
 
 
-def test(model: ResidualAttentionModel, test_loader: DataLoader):
+def test(model: ResidualAttentionModel, test_loader: DataLoader, args: Namespace):
     """Perform testing on the test set"""
     top1 = AverageMeter()
 
     model.eval()
 
+    count = 0
     correct = 0
     total = 0
     class_correct = np.zeros(10)
@@ -85,6 +89,25 @@ def test(model: ResidualAttentionModel, test_loader: DataLoader):
             label = labels[i]
             class_correct[label] += c[i]
             class_total[label] += 1
+
+        if args.test and count < 10:
+            i = 0
+            while torch.equal(predicted[i], labels[i]):
+                i += 1
+                if i == args.batch_size:
+                    break
+            else:
+                count += 1
+                inv_trans = transforms.Compose([
+                    transforms.Normalize(mean=[0., 0., 0.], std=[1 / 0.229, 1 / 0.224, 1 / 0.225]),
+                    transforms.Normalize(mean=[-0.485, -0.456, -0.406], std=[1., 1., 1.])
+                ])
+                images = inv_trans(images)
+                print(f"Example [{count}]:")
+                print(f"Prediction: {classes[predicted[i]]}")
+                print(f"Label: {classes[labels[i]]}")
+                plt.imshow(images[i].permute(1, 2, 0).cpu())
+                plt.show()
 
     print(f'Accuracy of the model on the test images: {top1.avg:.2f}%')
     for i in range(10):

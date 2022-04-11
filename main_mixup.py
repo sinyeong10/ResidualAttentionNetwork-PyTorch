@@ -1,11 +1,12 @@
-from torch.backends import cudnn
-from torch.utils.data import Dataset
-from torchvision import transforms, datasets
+from argparse import ArgumentParser
 
 from tensorboard_logger import configure
-from argparse import ArgumentParser
-from train_mixup import *
+from torch.backends import cudnn
+from torch.utils.data import Dataset
+from torchvision import datasets
+
 from test import *
+from train_mixup import *
 
 parser = ArgumentParser(description='PyTorch Residual Attention Network')
 parser.add_argument('--epochs', default=350, type=int,
@@ -29,11 +30,10 @@ parser.add_argument('--resume', default='', type=str,
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('--test', default='', type=str,
                     help='path to trained model (default: none)')
-parser.add_argument('--name', default='ResNet-92-32U', type=str,
+parser.add_argument('--name', default='ResNet-92-32U-Mixup', type=str,
                     help='name of experiment')
 parser.add_argument('--tensorboard',
                     help='Log progress to TensorBoard', action='store_true')
-
 
 best_prec1 = 0.
 args = Namespace
@@ -110,7 +110,7 @@ def main():
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
             print(f"=> loaded model '{args.test}'")
-            test(model, test_loader)
+            test(model, test_loader, args)
         else:
             print(f"=> no model found at '{args.test}'")
         return
@@ -141,7 +141,7 @@ def main():
         }, is_best, args=args)
     print(f'Best accuracy: {best_prec1:.3f}')
 
-    test(model, test_loader)
+    test(model, test_loader, args)
 
 
 if __name__ == "__main__":

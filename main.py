@@ -1,6 +1,6 @@
 from torch.backends import cudnn
 from torch.utils.data import Dataset
-from torchvision import transforms, datasets
+from torchvision import datasets
 
 from tensorboard_logger import configure
 from argparse import ArgumentParser
@@ -91,7 +91,7 @@ def main() -> None:
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
             print(f"=> loaded model '{args.test}'")
-            test(model, test_loader)
+            test(model, test_loader, args)
         else:
             print(f"=> no model found at '{args.test}'")
         return
@@ -122,7 +122,7 @@ def main() -> None:
         }, is_best, args=args)
     print('Best accuracy: ', best_prec1)
 
-    test(model, test_loader)
+    test(model, test_loader, args)
 
 
 if __name__ == "__main__":
