@@ -48,7 +48,7 @@ optional:
 | RAN92U (with mixup and simpler attention module) | CIFAR10 | 3.16        |
 
 ## Cite
-If you use DenseNets in your work, please cite the original paper as:
+If you use Residual Attention Networks in your work, please cite the original paper as:
 ```bibtex
 @misc{1704.06904,
     Author = {Fei Wang and Mengqing Jiang and Chen Qian and Shuo Yang and Cheng Li and Honggang Zhang and Xiaogang Wang and Xiaoou Tang},
