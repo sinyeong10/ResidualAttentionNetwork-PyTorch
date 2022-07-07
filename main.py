@@ -1,5 +1,6 @@
 from torch.backends import cudnn
 from torch.utils.data import Dataset
+from torchsummary import summary
 from torchvision import datasets
 
 from tensorboard_logger import configure
@@ -76,6 +77,7 @@ def main() -> None:
     # Create model
     model = ResidualAttentionModel()
     model = model.cuda()
+    summary(model, input_size=(3, 32, 32))
 
     # get the number of model parameters
     print(f'Number of model parameters: {sum([p.data.nelement() for p in model.parameters()])}')
