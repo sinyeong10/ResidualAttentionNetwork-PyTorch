@@ -7,8 +7,8 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 # based https://github.com/liudaizong/Residual-Attention-Network
-
-from residual_attention_network import ResidualAttentionModel92U as ResidualAttentionModel
+#ResidualAttentionModel92U, ResidualAttentionModel92
+from residual_attention_network import ResidualAttentionModel56 as ResidualAttentionModel
 from utils import *
 
 

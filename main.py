@@ -9,10 +9,10 @@ from train import *
 from test import *
 
 parser = ArgumentParser(description='PyTorch Residual Attention Network')
-parser.add_argument('--epochs', default=300, type=int,
+parser.add_argument('--epochs', default=50, type=int,
                     help='number of total epochs to run')
-parser.add_argument('-b', '--batch-size', default=64, type=int,
-                    help='mini-batch size (default: 64)')
+parser.add_argument('-b', '--batch-size', default=8, type=int,
+                    help='mini-batch size (default: 8)')
 parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
                     help='initial learning rate')
 parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
@@ -45,8 +45,11 @@ def main() -> None:
     normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]],
                                      std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
     transform = transforms.Compose([
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomCrop(32, padding=4),
+        # transforms.RandomHorizontalFlip(),
+        # transforms.RandomCrop(32, padding=4),
+        
+        transforms.Resize((224, 224)),
+
         transforms.ToTensor(),
         normalize
     ])
@@ -74,10 +77,20 @@ def main() -> None:
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size,
                                               shuffle=True, **kwargs)
 
+    
+    # import torchvision.models as models
+    # model = models.resnet18(pretrained=True)
+    # num_laryers = model.fc.in_features
+    # model.fc = nn.Linear(num_laryers, 10)
+
     # Create model
     model = ResidualAttentionModel()
     model = model.cuda()
-    summary(model, input_size=(3, 32, 32))
+    # summary(model, input_size=(3, 32, 32))
+    summary(model, input_size=(3, 224, 224))
+
+    # import sys
+    # sys.exit()
 
     # get the number of model parameters
     print(f'Number of model parameters: {sum([p.data.nelement() for p in model.parameters()])}')
@@ -99,14 +112,15 @@ def main() -> None:
         return
 
     criterion = nn.CrossEntropyLoss().cuda()
-    optimizer = torch.optim.SGD(model.parameters(), args.lr,
-                                momentum=args.momentum,
-                                nesterov=True,
-                                weight_decay=args.weight_decay)
+    # optimizer = torch.optim.SGD(model.parameters(), args.lr,
+                                # momentum=args.momentum,
+                                # nesterov=True,
+                                # weight_decay=args.weight_decay)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
     for epoch in range(args.epochs):
         # Decaying Learning Rate
-        adjust_learning_rate(optimizer, epoch, args)
+        # adjust_learning_rate(optimizer, epoch, args)  
 
         # train for one epoch
         train(model, train_loader, criterion, optimizer, epoch, args)

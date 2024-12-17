@@ -3,12 +3,14 @@ import time
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-# based https://github.com/liudaizong/Residual-Attention-Network
-from residual_attention_network import ResidualAttentionModel92U as ResidualAttentionModel
+# based https://github.com/liudaizong/Residual-Attention-
+#ResidualAttentionModel92U, ResidualAttentionModel92
+from residual_attention_network import ResidualAttentionModel56 as ResidualAttentionModel
 from utils import *
 
 # used for logging to TensorBoard
 from tensorboard_logger import log_value
+check_shape = False
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer',
            'dog', 'frog', 'horse', 'ship', 'truck')
@@ -26,6 +28,8 @@ def train(model: ResidualAttentionModel, train_loader: DataLoader, criterion: nn
 
     end = time.perf_counter()
     for i, (images, labels) in enumerate(train_loader):
+        if check_shape:
+            print("\n\nimages", images.shape) #images torch.Size([8, 3, 32, 32])
         images = images.cuda()
         labels = labels.cuda(non_blocking=True)
 

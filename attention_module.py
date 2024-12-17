@@ -1,6 +1,6 @@
 import torch.nn as nn
 from basic_layers import ResidualBlock
-
+check_shape = False
 
 class AttentionModulePre(nn.Module):
 
@@ -226,17 +226,31 @@ class AttentionModuleStage1(nn.Module):
         self.last_blocks = ResidualBlock(in_channels, out_channels)
 
     def forward(self, x):
-        x = self.first_residual_blocks(x)
+        if check_shape:
+            print("xinput", x.shape) #xinput torch.Size([2, 256, 8, 8])
+        x = self.first_residual_blocks(x)#x torch.Size([2, 256, 8, 8])
+        if check_shape:
+            print("x", x.shape)
         out_trunk = self.trunk_branches(x)
         out_mpool1 = self.mpool1(x)
         out_softmax1 = self.softmax1_blocks(out_mpool1)
         out_skip1_connection = self.skip1_connection_residual_block(out_softmax1)
-        out_mpool2 = self.mpool2(out_softmax1)
+        out_mpool2 = self.mpool2(out_softmax1) #out_mpool2 torch.Size([2, 256, 2, 2])s
+        if check_shape:
+            print("out_mpool2", out_mpool2.shape)
+
         out_softmax2 = self.softmax2_blocks(out_mpool2)
         out_skip2_connection = self.skip2_connection_residual_block(out_softmax2)
         out_mpool3 = self.mpool3(out_softmax2)
-        out_softmax3 = self.softmax3_blocks(out_mpool3)
-        #
+        out_softmax3 = self.softmax3_blocks(out_mpool3) #out_softmax3 shape: torch.Size([2, 256, 1, 1])
+        if check_shape:
+            print("out_softmax3 shape:", out_softmax3.shape)
+
+            print("out_interp3 shape after interpolation3:", self.interpolation3(out_softmax3).shape)
+            print("out_softmax2 shape:", out_softmax2.shape)
+        # out_interp3 shape after interpolation3: torch.Size([2, 256, 14, 14])
+        # out_softmax2 shape: torch.Size([2, 256, 2, 2])
+
         out_interp3 = self.interpolation3(out_softmax3) + out_softmax2
         # print(out_skip2_connection.data)
         # print(out_interp3.data)
@@ -405,14 +419,27 @@ class AttentionModuleStage1Cifar(nn.Module):
         self.last_blocks = ResidualBlock(in_channels, out_channels)
 
     def forward(self, x):
+        if check_shape:
+            print("xinput", x.shape) #xinput torch.Size([8, 128, 32, 32])
         x = self.first_residual_blocks(x)
+        if check_shape:
+            print("x", x.shape) #x torch.Size([8, 128, 32, 32])
         out_trunk = self.trunk_branches(x)
         out_mpool1 = self.mpool1(x)
         out_down_residual_blocks1 = self.down_residual_blocks1(out_mpool1)
         out_skip1_connection = self.skip1_connection_residual_block(out_down_residual_blocks1)
         out_mpool2 = self.mpool2(out_down_residual_blocks1)
-        out_middle_2r_blocks = self.middle_2r_blocks(out_mpool2)
-        #
+        out_middle_2r_blocks = self.middle_2r_blocks(out_mpool2)# out_middle_2r_blocks shape: torch.Size([8, 128, 8, 8])
+        
+
+        
+        # print("\n\nout_down_residual_blocks1 shape:", out_down_residual_blocks1.shape)
+        # print("\n\nout_interp shape after interpolation1:", self.interpolation1(out_middle_2r_blocks).shape)
+        # print("\n\nout_middle_2r_blocks shape:", out_middle_2r_blocks.shape)
+        # out_down_residual_blocks1 shape: torch.Size([8, 128, 16, 16])
+        # out_interp shape after interpolation1: torch.Size([8, 128, 16, 16])
+        # out_middle_2r_blocks shape: torch.Size([8, 128, 8, 8])
+
         out_interp = self.interpolation1(out_middle_2r_blocks) + out_down_residual_blocks1
         # print(out_skip2_connection.data)
         # print(out_interp3.data)

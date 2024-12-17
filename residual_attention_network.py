@@ -149,6 +149,7 @@ class ResidualAttentionModel56(nn.Module):
         out = self.mpool1(out)
         # print(out.data)
         out = self.residual_block1(out)
+
         out = self.attention_module1(out)
         out = self.residual_block2(out)
         out = self.attention_module2(out)
@@ -229,6 +230,7 @@ class ResidualAttentionModel92U(nn.Module):
         )  # 32*32
         # self.mpool1 = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)  # 16*16
         self.residual_block1 = ResidualBlock(32, 128)  # 32*32
+
         self.attention_module1 = AttentionModuleStage1Cifar(128, 128, size1=(32, 32), size2=(16, 16))  # 32*32
         self.residual_block2 = ResidualBlock(128, 256, 2)  # 16*16
         self.attention_module2 = AttentionModuleStage2Cifar(256, 256, size=(16, 16))  # 16*16
@@ -253,6 +255,7 @@ class ResidualAttentionModel92U(nn.Module):
         # print(out.data)
         out = self.residual_block1(out)
         out = self.attention_module1(out)
+        
         out = self.residual_block2(out)
         out = self.attention_module2(out)
         out = self.attention_module2_2(out)
